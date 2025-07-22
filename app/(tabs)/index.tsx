@@ -1,6 +1,10 @@
+import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
+import { fetchMovies } from "@/services/api";
+import useFetch from "@/services/hooks/usefetch";
+import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,10 +13,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import useFetch from "@/services/hooks/useHooks";
-import { fetchMovies } from "@/services/api";
-import { useEffect, useState } from "react";
 
 export default function Index() {
   const router = useRouter();
@@ -27,7 +27,14 @@ export default function Index() {
   <View className="flex-1 bg-primary">
     <Image source={images.bg} className="absolute w-full z-0" />
 
-    {/* Header Section */}
+    <ScrollView
+        className="flex-1 px-5"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          minHeight: "100%",
+          paddingBottom: 10,
+        }}
+      >
     <Image
       source={icons.logo}
       className="w-12 h-10 mt-20 mb-5 mx-auto"
@@ -61,7 +68,7 @@ export default function Index() {
         data={data?.results || []}
         keyExtractor={(item) => item?.id?.toString()}
         renderItem={({ item }) => (
-          <Text className="text-sm text-white">{item.title}</Text>
+          <MovieCard {...item}/>
         )}
         contentContainerStyle={{
           paddingHorizontal: 20,
@@ -69,9 +76,18 @@ export default function Index() {
           paddingTop: 10,
           minHeight: "100%",
         }}
+        numColumns={3}
         showsVerticalScrollIndicator={false}
+        columnWrapperStyle={{
+          justifyContent: "center", 
+          marginBottom: 16,
+          gap: 16,
+        }}
+        className="mt-2 pb-12"
+        scrollEnabled={false}
       />
     )}
+    </ScrollView>
   </View>
 );
 }

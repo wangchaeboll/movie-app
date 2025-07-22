@@ -1,18 +1,13 @@
-import MovieCard from "@/components/MovieCard";
-import SearchBar from "@/components/SearchBar";
-import { icons } from "@/constants/icons";
-import { images } from "@/constants/images";
-import { fetchMovies } from "@/services/api";
-import useFetch from "@/services/hooks/usefetch";
-import React, { useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
-
-const search = () => {
+const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, loading, error } = useFetch(() =>
-    fetchMovies({ query: searchQuery })
-  );
+  const {
+    data: movies = [],
+    loading,
+    error,
+    refetch: loadMovies,
+    reset,
+  } = useFetch(() => fetchMovies({ query: searchQuery }));
 
   return (
     <View className="flex-1 bg-primary">
@@ -24,9 +19,9 @@ const search = () => {
 
       <FlatList
         className="px-5"
-        data={data?.results || []}
-        keyExtractor={(item) => item?.id?.toString()}
-        renderItem={({ item }) => <MovieCard {...item} />}
+        data={movies as Movie[]}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <MovieDisplayCard {...item} />}
         numColumns={3}
         columnWrapperStyle={{
           justifyContent: "flex-start",
@@ -44,7 +39,7 @@ const search = () => {
               <SearchBar
                 placeholder="Search for a movie"
                 value={searchQuery}
-                onChangeText={(text) => setSearchQuery(text)}
+                onChangeText={handleSearch}
               />
             </View>
 
@@ -65,11 +60,8 @@ const search = () => {
             {!loading &&
               !error &&
               searchQuery.trim() &&
-              data?.results?.length! > 0 && (
-                <Text
-                  className="text-xl text-white font-bold"
-                  numberOfLines={1}
-                >
+              movies?.length! > 0 && (
+                <Text className="text-xl text-white font-bold">
                   Search Results for{" "}
                   <Text className="text-accent">{searchQuery}</Text>
                 </Text>
@@ -92,4 +84,4 @@ const search = () => {
   );
 };
 
-export default search;
+export default Search;
